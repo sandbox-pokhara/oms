@@ -1,0 +1,14 @@
+version: "3"
+
+tasks:
+  build:
+    cmds:
+      - docker build . -t ghcr.io/sandbox-pokhara/rzzy-oms
+
+  publish:
+    cmds:
+      - docker image push ghcr.io/sandbox-pokhara/rzzy-oms
+
+  deploy:
+    cmds:
+      - ssh rzzy -t "docker service update --with-registry-auth --image ghcr.io/sandbox-pokhara/rzzy-oms rzzy_oms"

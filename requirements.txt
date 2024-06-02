@@ -1,1 +1,7 @@
 django==5.0.6
+django-advanced-search==1.0.0
+django-form-action==1.0.5
+psycopg2-binary==2.9.9
+pydantic-settings==2.2.1
+pydantic==2.7.2
+whitenoise==6.6.0

@@ -11,6 +11,9 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'project.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "project.settings")
+from whitenoise import WhiteNoise  # type: ignore
 
+os.makedirs("staticfiles", exist_ok=True)  # fix: no directory warning
 application = get_wsgi_application()
+application = WhiteNoise(application, root="staticfiles")
