@@ -1,0 +1,30 @@
+version: "3"
+services:
+  db:
+    restart: unless-stopped
+    image: postgres:13-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    expose:
+      - 5432
+    env_file: .env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  web:
+    restart: unless-stopped
+    image: ghcr.io/sandbox-pokhara/rzzy-oms:latest
+    env_file: .env
+    environment:
+      - POSTGRES_HOST=db
+    ports:
+      - 8000:8000
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
