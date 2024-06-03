@@ -102,6 +102,9 @@ class Customer(TimestampedModel):
     # Home Address of the customer, may not be the Shipping Address
     address = OptionalCharField()
 
+    def __str__(self):
+        return self.full_name
+
 
 class Category(TimestampedModel):
     title = models.CharField(max_length=255, unique=True)
@@ -111,13 +114,18 @@ class Category(TimestampedModel):
     class Meta:
         verbose_name_plural = 'Categories'
 
+    def __str__(self):
+        return self.title
+
 
 class Size(TimestampedModel):
-    name = models.CharField(max_length=4, choices=SizeChoices.choices)
+    name = models.CharField(
+        max_length=4, choices=SizeChoices.choices, unique=True)
 
 
 class Color(TimestampedModel):
-    name = models.CharField(max_length=5, choices=ColorChoices.choices)
+    name = models.CharField(
+        max_length=5, choices=ColorChoices.choices, unique=True)
 
 
 class Product(TimestampedModel):
@@ -133,6 +141,9 @@ class Product(TimestampedModel):
     # current stock number, 0 = out of stock
     stock = models.PositiveSmallIntegerField(default=0)
     price = AmountField(default=Decimal('0.00'))
+
+    def __str__(self):
+        return self.title
 
 
 class Order(TimestampedModel):
@@ -163,6 +174,9 @@ class Order(TimestampedModel):
     shipped_at = OptionalDateTimeField()
     delivered_at = OptionalDateTimeField()
     paid_at = OptionalDateTimeField()   # full payment
+
+    def __str__(self):
+        return f'Order #{self.id}'
 
 
 class PaymentItem(TimestampedModel):

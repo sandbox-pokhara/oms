@@ -5,10 +5,12 @@ from django.contrib import messages
 from django.http.response import HttpResponseRedirect
 from io import StringIO
 import json
+from core import exceptions
 from decimal import Decimal, ROUND_HALF_UP
 
 from core import models
 from datetime import datetime
+from django.utils import timezone
 
 
 class DecimalEncoder(json.JSONEncoder):
@@ -16,6 +18,13 @@ class DecimalEncoder(json.JSONEncoder):
         if isinstance(o, Decimal):
             return str(o)
         return super().default(o)
+
+
+def get_unique_values(data, unique_field="id"):
+    try:
+        return list(d[unique_field] for d in data)
+    except KeyError:
+        return []
 
 
 def data_cleanup(raw):
@@ -60,11 +69,15 @@ def data_cleanup(raw):
         data["s_name"] = models.SizeChoices.XXL
     elif data["s_name"] == "Free-Size":
         data["s_name"] = models.SizeChoices.FREE
+    elif data["s_name"] == "":
+        data["s_name"] = models.SizeChoices.FREE
     if data["s_name"] not in models.SizeChoices.values:
         raise Exception(f"Invalid size type: {data['s_name']}")
 
     # color types:
     data["c_name"] = data["c_name"].title()
+    if data["c_name"] == "":
+        data["c_name"] = models.ColorChoices.BLACK
     if data["c_name"] not in models.ColorChoices.values:
         raise Exception(f"Invalid color type: {data['c_name']}")
 
@@ -76,6 +89,8 @@ def data_cleanup(raw):
     data["medium"] = data["medium"].title()
     if data["medium"] == "Physically":
         data["medium"] = models.MediumChoices.CONTACT
+    elif data["medium"] == "":
+        data["medium"] = models.MediumChoices.WEBSITE
     if data["medium"] not in models.MediumChoices.values:
         raise Exception(f"Invalid order medium: {data['medium']}")
 
@@ -88,6 +103,8 @@ def data_cleanup(raw):
         data["status"] = models.StatusChoices.PENDING
     elif data["status"] == "OH HOLD":
         data["status"] = models.StatusChoices.ONHOLD
+    elif data["status"] == "":
+        data["status"] = models.StatusChoices.PENDING
     if data["status"] not in models.StatusChoices.values:
         data["status"] = models.StatusChoices.PENDING
 
@@ -110,8 +127,11 @@ def data_cleanup(raw):
         data["is_paid"] = False
 
     # dates
-    # "ordered_at": "26/05/2024"
-    data["ordered_at"] = datetime.strptime(data["ordered_at"], "%d/%m/%Y")
+    try:
+        # "ordered_at": "26/05/2024"
+        data["ordered_at"] = datetime.strptime(data["ordered_at"], "%d/%m/%Y")
+    except ValueError:
+        data["ordered_at"] = timezone.now()
     # "shipped_at": "May 21, 2024"
     data["shipped_at"] = datetime.strptime(
         data["shipped_at"], "%B %d, %Y") if data["shipped_at"] else None
@@ -129,7 +149,7 @@ def data_cleanup(raw):
     if data["amount"]:
         data["is_advance"] = True
         data["amount"] = Decimal(data["amount"])
-    elif data["is_paid"] == "Paid":
+    elif data["is_paid"] is True:
         data["amount"] = data["total_price"]
     else:
         data["amount"] = Decimal('0.00')
@@ -149,6 +169,35 @@ def data_cleanup(raw):
     else:
         data["price_per_unit"] = data["price"]
 
+    # phone length validation
+    data["phone"] = data["phone"][:15]
+
+    # no name
+    if not data["full_name"]:
+        data["full_name"] = "N/A"
+
+    # no delivery_method, delivery_to
+    if data["delivery_method"] == "By Airport":
+        data["delivery_method"] = models.DeliveryMethodChoices.AIRPORT
+    if data["delivery_method"] == "NCM B2B":
+        data["delivery_method"] = models.DeliveryMethodChoices.NCM
+    elif data["delivery_method"] == "pick up":
+        data["delivery_method"] = models.DeliveryMethodChoices.SELF
+    elif data["delivery_method"] not in models.DeliveryMethodChoices.values:
+        data["delivery_method"] = models.DeliveryMethodChoices.SELF
+    if not data["delivery_to"]:
+        data["delivery_to"] = "N/A"
+
+    # empty data
+    if data["phone"] == "":
+        raise exceptions.EmptyDataError(f"No Phone. User: {data['full_name']}")
+    if data["c_title"] == "":
+        raise exceptions.EmptyDataError(
+            f"No Category Title. User: {data['phone']}")
+    if data["p_title"] == "":
+        raise exceptions.EmptyDataError(
+            f"No Product Title. User: {data['phone']}")
+
     return data
 
 
@@ -157,6 +206,7 @@ def upload_previous_orders(file):
     reader = csv.reader(content, delimiter=',')
     # skip the headers
     next(reader, None)
+    total_count = 0
     count = 0
     customers = []
     categories = []
@@ -202,7 +252,12 @@ def upload_previous_orders(file):
             "is_giveaway": row[28],
             "giveaway_reason": row[28],
         }
-        cleaned_data = data_cleanup(raw_data)
+        total_count += 1
+        try:
+            cleaned_data = data_cleanup(raw_data)
+        except exceptions.EmptyDataError as e:
+            print(e)
+            continue
         customer = {
             "full_name": cleaned_data["full_name"],
             "insta_handle": cleaned_data["insta_handle"],
@@ -268,6 +323,61 @@ def upload_previous_orders(file):
         payment_items.append(payment_item)
         order_items.append(order_item)
         count += 1
+
+    # get uniques
+    u_customers = get_unique_values(customers, "phone")
+    u_categories = get_unique_values(categories, "title")
+    u_products = get_unique_values(products, "title")
+
+    # bulk create
+    # customers
+    models.Customer.objects.bulk_create(
+        [models.Customer(**c) for c in customers], ignore_conflicts=True)
+    customer_ids = {c["phone"]: c["id"] for c in models.Customer.objects.filter(phone__in=u_customers).values(
+        "id", "phone").iterator()}
+    # categories
+    models.Category.objects.bulk_create(
+        [models.Category(**c) for c in categories], ignore_conflicts=True)
+    # get ids for unique category entries
+    category_ids = {c["title"]: c["id"] for c in models.Category.objects.filter(title__in=u_categories).values(
+        "id", "title").iterator()}
+    # sizes
+    models.Size.objects.bulk_create(
+        [models.Size(**s) for s in sizes], ignore_conflicts=True)
+    # colors
+    models.Color.objects.bulk_create(
+        [models.Color(**c) for c in colors], ignore_conflicts=True)
+    # products
+    for p in products:
+        p["category_id"] = category_ids[p["category__title"]]
+        p.pop("category__title", None)
+    models.Product.objects.bulk_create(
+        [models.Product(**p) for p in products], ignore_conflicts=True)
+    product_ids = {p["title"]: p["id"] for p in models.Product.objects.filter(title__in=u_products).values(
+        "id", "title").iterator()}
+    # orders
+    if not (len(orders) == len(payment_items) == len(order_items)):
+        raise ValueError(
+            "Orders, payment items and order items not equal in len")
+    for o in orders:
+        o["customer_id"] = customer_ids[o["customer__phone"]]
+        o.pop("customer__phone", None)
+    order_ids = models.Order.objects.bulk_create(
+        [models.Order(**o) for o in orders])
+    # payment_items
+    for idx, p in enumerate(payment_items):
+        p["order_id"] = order_ids[idx].id
+    models.PaymentItem.objects.bulk_create(
+        [models.PaymentItem(**p) for p in payment_items])
+    # order_items
+    for idx, o in enumerate(order_items):
+        o["order_id"] = order_ids[idx].id
+        o["product_id"] = product_ids[o["product__title"]]
+        o.pop("product__title", None)
+    models.OrderItem.objects.bulk_create(
+        [models.OrderItem(**o) for o in order_items])
+
+    # remove this codeblock
     with open("test-clean.json", "w") as f:
         json.dump({
             "customers": customers,
@@ -280,16 +390,16 @@ def upload_previous_orders(file):
             "order_items": order_items
         }, f, default=str)
 
-    return count
+    return count, total_count
 
 
 @extra_button("Upload Orders (CSV)", OrderUploadForm)
 def upload_orders_csv(request, form):
     try:
-        count = upload_previous_orders(form.cleaned_data["file"])
+        count, total_count = upload_previous_orders(form.cleaned_data["file"])
         if count > 0:
             messages.add_message(
-                request, messages.INFO, f"Successfully uploaded {count} order(s)"
+                request, messages.INFO, f"Successfully uploaded {count} / {total_count} order(s)"
             )
         else:
             messages.add_message(
