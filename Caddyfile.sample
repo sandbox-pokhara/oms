@@ -1,0 +1,15 @@
+rzzy.sandbox.com.np {
+        root /srv/rzzy-oms
+
+        handle /admin/* {
+          reverse_proxy localhost:8000
+        }
+
+        handle_path /static/* {
+          file_server
+        }
+
+        handle {
+        respond "404 Not Found" 404
+        }
+}
