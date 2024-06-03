@@ -11,7 +11,7 @@ tasks:
 
   deploy:
     cmds:
-      - ssh rzzy -t "docker compose -f docker-compose.prod.yml pull && docker compose -f docker-compose.prod.yml up --force-recreate --remove-orphans --build --detach"
+      - ssh rzzy -t "cd rzzy-oms && git pull && docker compose -f docker-compose.prod.yml pull && docker compose -f docker-compose.prod.yml up --force-recreate --remove-orphans --build --detach"
 
   restart-caddy:
     cmds:
