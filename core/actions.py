@@ -4,6 +4,8 @@ from datetime import datetime
 from decimal import ROUND_HALF_UP
 from decimal import Decimal
 from io import StringIO
+from typing import Any
+from typing import BinaryIO
 
 import httpx
 from django.contrib import admin
@@ -12,7 +14,7 @@ from django.db.models.query import QuerySet
 from django.http import HttpRequest
 from django.http.response import HttpResponseRedirect
 from django.utils import timezone
-from form_action import extra_button
+from form_action import extra_button  # type: ignore
 
 from core import exceptions
 from core import models
@@ -20,20 +22,20 @@ from core.forms import OrderUploadForm
 
 
 class DecimalEncoder(json.JSONEncoder):
-    def default(self, o):
+    def default(self, o: Any):
         if isinstance(o, Decimal):
             return str(o)
         return super().default(o)
 
 
-def get_unique_values(data, unique_field="id"):
+def get_unique_values(data: list[Any], unique_field: str = "id") -> list[Any]:
     try:
         return list(d[unique_field] for d in data)
     except KeyError:
         return []
 
 
-def data_cleanup(raw):
+def data_cleanup(raw: dict[str, Any]):
     # shallow copy
     data = dict(raw)
     # trim leading and trailing spaces
@@ -229,21 +231,21 @@ def data_cleanup(raw):
     return data
 
 
-def upload_previous_orders(file):
+def upload_previous_orders(file: BinaryIO):
     content = StringIO(file.read().decode("utf-8"))
     reader = csv.reader(content, delimiter=",")
     # skip the headers
     next(reader, None)
     total_count = 0
     count = 0
-    customers = []
-    categories = []
-    sizes = []
-    colors = []
-    products = []
-    orders = []
-    payment_items = []
-    order_items = []
+    customers: list[dict[str, Any]] = []
+    categories: list[dict[str, str]] = []
+    sizes: list[dict[str, str]] = []
+    colors: list[dict[str, str]] = []
+    products: list[dict[str, str]] = []
+    orders: list[dict[str, Any]] = []
+    payment_items: list[dict[str, Any]] = []
+    order_items: list[dict[str, Any]] = []
     for row in reader:
         raw_data = {
             "delivery_package_id": row[1],
@@ -413,13 +415,13 @@ def upload_previous_orders(file):
     )
     # payment_items
     for idx, p in enumerate(payment_items):
-        p["order_id"] = order_ids[idx].id
+        p["order_id"] = order_ids[idx].id  # type: ignore
     models.PaymentItem.objects.bulk_create(
         [models.PaymentItem(**p) for p in payment_items]
     )
     # order_items
     for idx, o in enumerate(order_items):
-        o["order_id"] = order_ids[idx].id
+        o["order_id"] = order_ids[idx].id  # type: ignore
         o["product_id"] = product_ids[o["product__title"]]
         o.pop("product__title", None)
     models.OrderItem.objects.bulk_create(
@@ -447,7 +449,7 @@ def upload_previous_orders(file):
 
 
 @extra_button("Upload Orders (CSV)", OrderUploadForm)
-def upload_orders_csv(request, form):
+def upload_orders_csv(request: HttpRequest, form: OrderUploadForm):
     try:
         count, total_count = upload_previous_orders(form.cleaned_data["file"])
         if count > 0:

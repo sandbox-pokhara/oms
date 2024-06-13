@@ -1,5 +1,5 @@
-rzzy.sandbox.com.np {
-        root /srv/rzzy-oms
+oms.sandbox.com.np {
+        root /srv/oms
 
         handle /admin/* {
           reverse_proxy localhost:8000

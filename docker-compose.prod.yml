@@ -9,19 +9,19 @@ services:
       - 5432
     env_file: .env
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 5s
       timeout: 5s
       retries: 5
 
   web:
     restart: unless-stopped
-    image: ghcr.io/sandbox-pokhara/rzzy-oms:latest
+    image: ghcr.io/sandbox-pokhara/oms:latest
     env_file: .env
     environment:
       - POSTGRES_HOST=db
     volumes:
-      - /srv/rzzy-oms/:/app/static/
+      - /srv/oms/:/app/static/
     ports:
       - 8000:8000
     depends_on:
