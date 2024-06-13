@@ -196,3 +196,8 @@ class OrderItemAdmin(admin.ModelAdmin):
     @admin.display(description="Ordered by")
     def get_ordered_by(self, obj):
         return obj.order.customer.full_name
+
+
+@admin.register(models.Settings)
+class SettingsAdmin(admin.ModelAdmin):
+    list_display = ("id", "wc_consumer_key", "wc_consumer_secret")

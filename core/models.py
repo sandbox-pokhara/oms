@@ -1,10 +1,14 @@
 from decimal import Decimal
 from functools import partial
+from typing import Any
 
 from django.db import models
 from django.utils import timezone
 
 
+##############################################################################
+### Choices
+##############################################################################
 class Gender(models.TextChoices):
     MALE = "Male"
     FEMALE = "Female"
@@ -64,6 +68,50 @@ class LogoChoices(models.TextChoices):
     AOT = "Attack On Titan"
     OP3D2Y = "Onepiece 3D2Y"
     BERSERK = "Berserk"
+
+
+##############################################################################
+### Custom Fields
+##############################################################################
+OptionalCharField = partial(
+    models.CharField, max_length=255, blank=True, default=""
+)
+OptionalTextField = partial(models.TextField, blank=True, default="")
+OptionalEmailField = partial(
+    models.EmailField, max_length=255, blank=True, default=""
+)
+OptionalURLField = partial(
+    models.URLField, max_length=255, blank=True, default=""
+)
+OptionalDateTimeField = partial(
+    models.DateTimeField, blank=True, null=True, default=None
+)
+AmountField = partial(
+    models.DecimalField,
+    max_digits=10,
+    decimal_places=2,
+    default=Decimal("5000.00"),
+)
+
+
+##############################################################################
+### Models
+##############################################################################
+class Settings(models.Model):
+    wc_consumer_key = models.CharField(max_length=64, blank=True, default="")
+    wc_consumer_secret = models.CharField(
+        max_length=64, blank=True, default=""
+    )
+
+    class Meta:
+        verbose_name_plural = "Settings"
+
+    def save(self, *args: Any, **kwargs: Any):
+        self.id = 1
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return "Settings"
 
 
 class TimestampedModel(models.Model):
