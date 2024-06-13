@@ -1,0 +1,521 @@
+### New Order created WC webhook
+POST http://localhost:8000/api/wcorders/
+Authorization: Basic admin:admin
+Content-Type: application/json
+
+{
+    "id": 4624,
+    "parent_id": 0,
+    "status": "processing",
+    "currency": "NPR",
+    "version": "8.8.5",
+    "prices_include_tax": false,
+    "date_created": "2024-06-12T07:05:56",
+    "date_modified": "2024-06-12T07:05:56",
+    "discount_total": "555",
+    "discount_tax": "0",
+    "shipping_total": "150",
+    "shipping_tax": "0",
+    "cart_tax": "0",
+    "total": "5143",
+    "total_tax": "0",
+    "customer_id": 145,
+    "order_key": "wc_order_fdqKhqbFYwilB",
+    "billing": {
+        "first_name": "Chirag",
+        "last_name": "Lamsal",
+        "company": "",
+        "address_1": "Municipal-10, City",
+        "address_2": "",
+        "city": "",
+        "state": "NP036",
+        "postcode": "",
+        "country": "NP",
+        "email": "chirag.lamsal@sandbox.com.np",
+        "phone": "9876543210"
+    },
+    "shipping": {
+        "first_name": "Chirag",
+        "last_name": "Lamsal",
+        "company": "",
+        "address_1": "Municipal-10, City",
+        "address_2": "",
+        "city": "",
+        "state": "NP036",
+        "postcode": "",
+        "country": "NP",
+        "phone": ""
+    },
+    "payment_method": "cod",
+    "payment_method_title": "Cash on delivery",
+    "transaction_id": "",
+    "customer_ip_address": "192.168.1.0",
+    "customer_user_agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+    "created_via": "checkout",
+    "customer_note": "",
+    "date_completed": null,
+    "date_paid": null,
+    "cart_hash": "0440fe815e727fffb21ae6994ddb3d5d",
+    "number": "4624",
+    "meta_data": [
+        {
+            "id": 75278,
+            "key": "_shipping_wooccm9",
+            "value": ""
+        },
+        {
+            "id": 75279,
+            "key": "is_vat_exempt",
+            "value": "no"
+        },
+        {
+            "id": 75280,
+            "key": "_wdr_discounts",
+            "value": {
+                "free_shipping": false,
+                "cart_discounts": {
+                    "applied_as": "coupon",
+                    "combine_all_discounts": false,
+                    "applied_coupons": [
+                        {
+                            "name": "bulk order discount",
+                            "value": 554.8,
+                            "rules": [
+                                {
+                                    "id": 2,
+                                    "title": "Bulk Order Discount",
+                                    "discount": {
+                                        "discount_label": "Bulk Order Discount",
+                                        "discount_value": 554.8
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "saved_amount": {
+                    "product_level": 0,
+                    "product_level_based_on_tax_settings": 0,
+                    "cart_level": 554.8,
+                    "total": 554.8,
+                    "total_based_on_tax_settings": 554.8
+                }
+            }
+        },
+        {
+            "id": 75281,
+            "key": "_wc_order_attribution_source_type",
+            "value": "typein"
+        },
+        {
+            "id": 75282,
+            "key": "_wc_order_attribution_utm_source",
+            "value": "(direct)"
+        },
+        {
+            "id": 75283,
+            "key": "_wc_order_attribution_session_entry",
+            "value": "https://www.rzzyofficial.com/cart/"
+        },
+        {
+            "id": 75284,
+            "key": "_wc_order_attribution_session_start_time",
+            "value": "2024-06-12 06:31:40"
+        },
+        {
+            "id": 75285,
+            "key": "_wc_order_attribution_session_pages",
+            "value": "33"
+        },
+        {
+            "id": 75286,
+            "key": "_wc_order_attribution_session_count",
+            "value": "1"
+        },
+        {
+            "id": 75287,
+            "key": "_wc_order_attribution_user_agent",
+            "value": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+        },
+        {
+            "id": 75288,
+            "key": "_wc_order_attribution_device_type",
+            "value": "Desktop"
+        }
+    ],
+    "line_items": [
+        {
+            "id": 1253,
+            "name": "Yuta Cursed Energy",
+            "product_id": 4600,
+            "variation_id": 4607,
+            "quantity": 2,
+            "tax_class": "",
+            "subtotal": "4198",
+            "subtotal_tax": "0",
+            "total": "3778",
+            "total_tax": "0",
+            "taxes": [],
+            "meta_data": [
+                {
+                    "id": 10911,
+                    "key": "pa_include-longsleeve",
+                    "value": "yes",
+                    "display_key": "Include Longsleeve ?",
+                    "display_value": "Yes"
+                },
+                {
+                    "id": 10912,
+                    "key": "pa_size",
+                    "value": "l",
+                    "display_key": "Size",
+                    "display_value": "L"
+                },
+                {
+                    "id": 10913,
+                    "key": "_advanced_woo_discount_item_total_discount",
+                    "value": {
+                        "initial_price": 2099,
+                        "discounted_price": 2099,
+                        "total_discount_details": [],
+                        "cart_discount_details": {
+                            "2": {
+                                "cart_discount": "10",
+                                "cart_shipping": "no",
+                                "cart_discount_type": "percentage",
+                                "cart_discount_label": "Bulk Order Discount",
+                                "cart_discount_price": 419.8,
+                                "cart_discount_product_price": 209.9
+                            }
+                        },
+                        "apply_as_cart_rule": [
+                            "yes"
+                        ],
+                        "discount_lines": {
+                            "non_applied": {
+                                "quantity": 2,
+                                "discount": 0,
+                                "price": 2099,
+                                "calculate_discount_from": 2099
+                            }
+                        },
+                        "cart_quantity": 2,
+                        "product_id": 4607,
+                        "initial_price_based_on_tax_settings": 2099,
+                        "discounted_price_based_on_tax_settings": 2099
+                    },
+                    "display_key": "_advanced_woo_discount_item_total_discount",
+                    "display_value": {
+                        "initial_price": 2099,
+                        "discounted_price": 2099,
+                        "total_discount_details": [],
+                        "cart_discount_details": {
+                            "2": {
+                                "cart_discount": "10",
+                                "cart_shipping": "no",
+                                "cart_discount_type": "percentage",
+                                "cart_discount_label": "Bulk Order Discount",
+                                "cart_discount_price": 419.8,
+                                "cart_discount_product_price": 209.9
+                            }
+                        },
+                        "apply_as_cart_rule": [
+                            "yes"
+                        ],
+                        "discount_lines": {
+                            "non_applied": {
+                                "quantity": 2,
+                                "discount": 0,
+                                "price": 2099,
+                                "calculate_discount_from": 2099
+                            }
+                        },
+                        "cart_quantity": 2,
+                        "product_id": 4607,
+                        "initial_price_based_on_tax_settings": 2099,
+                        "discounted_price_based_on_tax_settings": 2099
+                    }
+                },
+                {
+                    "id": 10914,
+                    "key": "_wdr_discounts",
+                    "value": {
+                        "initial_price": 2099,
+                        "discounted_price": 2099,
+                        "initial_price_based_on_tax_settings": 2099,
+                        "discounted_price_based_on_tax_settings": 2099,
+                        "applied_rules": [
+                            {
+                                "id": 2,
+                                "title": "Bulk Order Discount",
+                                "type": "bulk_discount",
+                                "discount": {
+                                    "applied_in": "cart_level",
+                                    "discount_type": "percentage",
+                                    "discount_value": 10,
+                                    "discount_label": "Bulk Order Discount",
+                                    "discount_price": 419.8
+                                }
+                            }
+                        ],
+                        "saved_amount": 0,
+                        "saved_amount_based_on_tax_settings": 0,
+                        "is_free_product": false
+                    },
+                    "display_key": "_wdr_discounts",
+                    "display_value": {
+                        "initial_price": 2099,
+                        "discounted_price": 2099,
+                        "initial_price_based_on_tax_settings": 2099,
+                        "discounted_price_based_on_tax_settings": 2099,
+                        "applied_rules": [
+                            {
+                                "id": 2,
+                                "title": "Bulk Order Discount",
+                                "type": "bulk_discount",
+                                "discount": {
+                                    "applied_in": "cart_level",
+                                    "discount_type": "percentage",
+                                    "discount_value": 10,
+                                    "discount_label": "Bulk Order Discount",
+                                    "discount_price": 419.8
+                                }
+                            }
+                        ],
+                        "saved_amount": 0,
+                        "saved_amount_based_on_tax_settings": 0,
+                        "is_free_product": false
+                    }
+                }
+            ],
+            "sku": "",
+            "price": 1889,
+            "image": {
+                "id": 4601,
+                "src": "https://www.rzzyofficial.com/wp-content/uploads/2024/06/1-1.jpg"
+            },
+            "parent_name": "Yuta Cursed Energy"
+        },
+        {
+            "id": 1254,
+            "name": "Minimalist Shorts",
+            "product_id": 3729,
+            "variation_id": 3945,
+            "quantity": 1,
+            "tax_class": "",
+            "subtotal": "1350",
+            "subtotal_tax": "0",
+            "total": "1215",
+            "total_tax": "0",
+            "taxes": [],
+            "meta_data": [
+                {
+                    "id": 10924,
+                    "key": "pa_size",
+                    "value": "xl",
+                    "display_key": "Size",
+                    "display_value": "XL"
+                },
+                {
+                    "id": 10925,
+                    "key": "pa_minimal-logo-variation",
+                    "value": "berserk",
+                    "display_key": "Minimal Logo Variation",
+                    "display_value": "Berserk"
+                },
+                {
+                    "id": 10926,
+                    "key": "_advanced_woo_discount_item_total_discount",
+                    "value": {
+                        "initial_price": 1350,
+                        "discounted_price": 1350,
+                        "total_discount_details": [],
+                        "cart_discount_details": {
+                            "2": {
+                                "cart_discount": "10",
+                                "cart_shipping": "no",
+                                "cart_discount_type": "percentage",
+                                "cart_discount_label": "Bulk Order Discount",
+                                "cart_discount_price": 135,
+                                "cart_discount_product_price": 135
+                            }
+                        },
+                        "apply_as_cart_rule": [
+                            "yes"
+                        ],
+                        "discount_lines": {
+                            "non_applied": {
+                                "quantity": 1,
+                                "discount": 0,
+                                "price": 1350,
+                                "calculate_discount_from": 1350
+                            }
+                        },
+                        "cart_quantity": 1,
+                        "product_id": 3945,
+                        "initial_price_based_on_tax_settings": 1350,
+                        "discounted_price_based_on_tax_settings": 1350
+                    },
+                    "display_key": "_advanced_woo_discount_item_total_discount",
+                    "display_value": {
+                        "initial_price": 1350,
+                        "discounted_price": 1350,
+                        "total_discount_details": [],
+                        "cart_discount_details": {
+                            "2": {
+                                "cart_discount": "10",
+                                "cart_shipping": "no",
+                                "cart_discount_type": "percentage",
+                                "cart_discount_label": "Bulk Order Discount",
+                                "cart_discount_price": 135,
+                                "cart_discount_product_price": 135
+                            }
+                        },
+                        "apply_as_cart_rule": [
+                            "yes"
+                        ],
+                        "discount_lines": {
+                            "non_applied": {
+                                "quantity": 1,
+                                "discount": 0,
+                                "price": 1350,
+                                "calculate_discount_from": 1350
+                            }
+                        },
+                        "cart_quantity": 1,
+                        "product_id": 3945,
+                        "initial_price_based_on_tax_settings": 1350,
+                        "discounted_price_based_on_tax_settings": 1350
+                    }
+                },
+                {
+                    "id": 10927,
+                    "key": "_wdr_discounts",
+                    "value": {
+                        "initial_price": 1350,
+                        "discounted_price": 1350,
+                        "initial_price_based_on_tax_settings": 1350,
+                        "discounted_price_based_on_tax_settings": 1350,
+                        "applied_rules": [
+                            {
+                                "id": 2,
+                                "title": "Bulk Order Discount",
+                                "type": "bulk_discount",
+                                "discount": {
+                                    "applied_in": "cart_level",
+                                    "discount_type": "percentage",
+                                    "discount_value": 10,
+                                    "discount_label": "Bulk Order Discount",
+                                    "discount_price": 135
+                                }
+                            }
+                        ],
+                        "saved_amount": 0,
+                        "saved_amount_based_on_tax_settings": 0,
+                        "is_free_product": false
+                    },
+                    "display_key": "_wdr_discounts",
+                    "display_value": {
+                        "initial_price": 1350,
+                        "discounted_price": 1350,
+                        "initial_price_based_on_tax_settings": 1350,
+                        "discounted_price_based_on_tax_settings": 1350,
+                        "applied_rules": [
+                            {
+                                "id": 2,
+                                "title": "Bulk Order Discount",
+                                "type": "bulk_discount",
+                                "discount": {
+                                    "applied_in": "cart_level",
+                                    "discount_type": "percentage",
+                                    "discount_value": 10,
+                                    "discount_label": "Bulk Order Discount",
+                                    "discount_price": 135
+                                }
+                            }
+                        ],
+                        "saved_amount": 0,
+                        "saved_amount_based_on_tax_settings": 0,
+                        "is_free_product": false
+                    }
+                }
+            ],
+            "sku": "",
+            "price": 1215,
+            "image": {
+                "id": 3737,
+                "src": "https://www.rzzyofficial.com/wp-content/uploads/2024/04/2-6.jpg"
+            },
+            "parent_name": "Minimalist Shorts"
+        }
+    ],
+    "tax_lines": [],
+    "shipping_lines": [
+        {
+            "id": 1255,
+            "method_title": "Flat rate",
+            "method_id": "flat_rate",
+            "instance_id": "8",
+            "total": "150",
+            "total_tax": "0",
+            "taxes": [],
+            "meta_data": [
+                {
+                    "id": 10933,
+                    "key": "Items",
+                    "value": "Yuta Cursed Energy &times; 2, Minimalist Shorts &times; 1",
+                    "display_key": "Items",
+                    "display_value": "Yuta Cursed Energy &times; 2, Minimalist Shorts &times; 1"
+                }
+            ]
+        }
+    ],
+    "fee_lines": [],
+    "coupon_lines": [
+        {
+            "id": 1256,
+            "code": "bulk order discount",
+            "discount": "555",
+            "discount_tax": "0",
+            "meta_data": [
+                {
+                    "id": 10936,
+                    "key": "coupon_info",
+                    "value": "[0,\"bulk order discount\",\"percent\",10]",
+                    "display_key": "coupon_info",
+                    "display_value": "[0,\"bulk order discount\",\"percent\",10]"
+                }
+            ],
+            "discount_type": "percent",
+            "nominal_amount": 10,
+            "free_shipping": false
+        }
+    ],
+    "refunds": [],
+    "payment_url": "https://www.rzzyofficial.com/checkout/order-pay/4624/?pay_for_order=true&key=wc_order_fdqKhqbFYwilB",
+    "is_editable": false,
+    "needs_payment": false,
+    "needs_processing": true,
+    "date_created_gmt": "2024-06-12T07:05:56",
+    "date_modified_gmt": "2024-06-12T07:05:56",
+    "date_completed_gmt": null,
+    "date_paid_gmt": null,
+    "currency_symbol": "₨",
+    "_links": {
+        "self": [
+            {
+                "href": "https://www.rzzyofficial.com/wp-json/wc/v3/orders/4624"
+            }
+        ],
+        "collection": [
+            {
+                "href": "https://www.rzzyofficial.com/wp-json/wc/v3/orders"
+            }
+        ],
+        "customer": [
+            {
+                "href": "https://www.rzzyofficial.com/wp-json/wc/v3/customers/145"
+            }
+        ]
+    }
+}

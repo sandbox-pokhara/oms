@@ -35,6 +35,8 @@ class StatusChoices(models.TextChoices):
     CANCELED = 'Canceled'
     DISPUTED = 'Disputed'
     COMPLETED = 'Completed'
+    FAILED = 'Failed'
+    DRAFT = 'Draft'
 
 
 class DeliveryMethodChoices(models.TextChoices):
@@ -59,7 +61,8 @@ class PaymentMethodChoices(models.TextChoices):
     EBANKING = 'ebanking'
 
 
-class LogoChoices(models.TextChoices):
+class LogoVariationChoices(models.TextChoices):
+    DEFAULT = 'Default'
     RZZY = 'Rzzy'
     AOT = 'Attack On Titan'
     OP3D2Y = 'Onepiece 3D2Y'
@@ -141,6 +144,8 @@ class Product(TimestampedModel):
     # current stock number, 0 = out of stock
     stock = models.PositiveSmallIntegerField(default=0)
     price = AmountField(default=Decimal('0.00'))
+    # medium product id (Woocommerce or Notion) if any
+    medium_product_id = OptionalCharField()
 
     def __str__(self):
         return self.title
@@ -151,14 +156,21 @@ class Order(TimestampedModel):
         Customer, on_delete=models.PROTECT, related_name='orders')
     medium = models.CharField(
         max_length=9, choices=MediumChoices.choices, default=MediumChoices.WEBSITE)
+    # medium order id (Woocommerce or Notion) if any
+    medium_order_id = OptionalCharField()
+    # woocommerce order key (wc_order_fdqKhqbFYwilB)
+    wc_order_key = OptionalCharField()
     status = models.CharField(
         max_length=9, choices=StatusChoices.choices, default=StatusChoices.PENDING)
     subtotal_price = AmountField()
     delivery_charge = AmountField(default=Decimal('150.00'))
+    # total discount, Sum of all order items' discount
     discount = AmountField(default=Decimal('0.00'))
     # grand total
     total_price = AmountField()
     is_paid = models.BooleanField(default=False)
+    # customer notes for order, can be same as delivery_note
+    customer_note = OptionalTextField()
     # delivery to/from addresses
     delivery_from = OptionalCharField(default='Pokhara')
     delivery_to = models.CharField(max_length=255)
@@ -196,6 +208,8 @@ class OrderItem(TimestampedModel):
         Product, on_delete=models.PROTECT, related_name='order_items')
     order = models.ForeignKey(
         Order, on_delete=models.PROTECT, related_name='order_items')
+    # medium order item id (Woocommerce or Notion) if any
+    medium_item_id = OptionalCharField()
     # giveaway OrderItem's price will not contribute in Order's total price
     # those Orders might have total price=0.00, and no payment items
     is_giveaway = models.BooleanField(default=False)
@@ -204,13 +218,17 @@ class OrderItem(TimestampedModel):
         max_length=4, choices=SizeChoices.choices, default=SizeChoices.M)
     color = models.CharField(
         max_length=5, choices=ColorChoices.choices, default=ColorChoices.BLACK)
+    logo_variation = models.CharField(
+        max_length=15, choices=LogoVariationChoices.choices, default=LogoVariationChoices.DEFAULT)
     # quantity of same product ordered
     quantity = models.PositiveSmallIntegerField(default=1)
     # added charge for including longsleeve
     include_longsleeve = models.BooleanField(default=False)
     # price of a single product
     price_per_unit = AmountField()
-    # price for all products
+    # discount in each order item(not each product)
+    discount = AmountField(default=Decimal('0.00'))
+    # price for all products (after discount)
     price = AmountField()
     # if the item is disputed(request for return/exchange/refund)
     is_disputed = models.BooleanField(default=False)
