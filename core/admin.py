@@ -6,6 +6,10 @@ from core import models
 from core.actions import upload_orders_csv
 
 
+class OrderItemInline(admin.TabularInline):
+    model = models.OrderItem
+
+
 @admin.register(models.Customer)
 class CustomerAdmin(admin.ModelAdmin):
     list_display = (
@@ -139,6 +143,8 @@ class OrderAdmin(ExtraButtonMixin, admin.ModelAdmin):
     )
 
     list_filter = ("status", "customer__gender", "is_paid", "delivery_method")
+
+    inlines = (OrderItemInline,)
 
     extra_buttons = (upload_orders_csv,)
 
