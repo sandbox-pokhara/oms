@@ -1,16 +1,18 @@
 import csv
-from form_action import extra_button
-from core.forms import OrderUploadForm
+import json
+from datetime import datetime
+from decimal import ROUND_HALF_UP
+from decimal import Decimal
+from io import StringIO
+
 from django.contrib import messages
 from django.http.response import HttpResponseRedirect
-from io import StringIO
-import json
-from core import exceptions
-from decimal import Decimal, ROUND_HALF_UP
-
-from core import models
-from datetime import datetime
 from django.utils import timezone
+from form_action import extra_button
+
+from core import exceptions
+from core import models
+from core.forms import OrderUploadForm
 
 
 class DecimalEncoder(json.JSONEncoder):
@@ -82,8 +84,9 @@ def data_cleanup(raw):
         raise Exception(f"Invalid color type: {data['c_name']}")
 
     # product title
-    data["p_title"] = data["p_title"].upper().replace(
-        '"', "").replace(" ", "-")
+    data["p_title"] = (
+        data["p_title"].upper().replace('"', "").replace(" ", "-")
+    )
 
     # order medium
     data["medium"] = data["medium"].title()
@@ -109,16 +112,27 @@ def data_cleanup(raw):
         data["status"] = models.StatusChoices.PENDING
 
     # pricing
-    data["subtotal_price"] = Decimal(
-        data["subtotal_price"]) if data["subtotal_price"] else Decimal('0.00')
-    data["total_price"] = Decimal(
-        data["total_price"]) if data["total_price"] else Decimal('0.00')
-    data["price"] = Decimal(
-        data["price"]) if data["price"] else Decimal('0.00')
-    data["discount"] = Decimal(
-        data["discount"]) if data["discount"] else Decimal('0.00')
-    data["delivery_charge"] = Decimal(
-        data["delivery_charge"]) if data["delivery_charge"] else Decimal('0.00')
+    data["subtotal_price"] = (
+        Decimal(data["subtotal_price"])
+        if data["subtotal_price"]
+        else Decimal("0.00")
+    )
+    data["total_price"] = (
+        Decimal(data["total_price"])
+        if data["total_price"]
+        else Decimal("0.00")
+    )
+    data["price"] = (
+        Decimal(data["price"]) if data["price"] else Decimal("0.00")
+    )
+    data["discount"] = (
+        Decimal(data["discount"]) if data["discount"] else Decimal("0.00")
+    )
+    data["delivery_charge"] = (
+        Decimal(data["delivery_charge"])
+        if data["delivery_charge"]
+        else Decimal("0.00")
+    )
 
     # paid
     if data["is_paid"] == "Paid":
@@ -133,11 +147,17 @@ def data_cleanup(raw):
     except ValueError:
         data["ordered_at"] = timezone.now()
     # "shipped_at": "May 21, 2024"
-    data["shipped_at"] = datetime.strptime(
-        data["shipped_at"], "%B %d, %Y") if data["shipped_at"] else None
+    data["shipped_at"] = (
+        datetime.strptime(data["shipped_at"], "%B %d, %Y")
+        if data["shipped_at"]
+        else None
+    )
     # "paid_at": "May 21, 2024"
-    data["paid_at"] = datetime.strptime(
-        data["paid_at"], "%B %d, %Y") if data["paid_at"] else None
+    data["paid_at"] = (
+        datetime.strptime(data["paid_at"], "%B %d, %Y")
+        if data["paid_at"]
+        else None
+    )
 
     # payment method
     data["payment_method"] = data["payment_method"].title()
@@ -152,7 +172,7 @@ def data_cleanup(raw):
     elif data["is_paid"] is True:
         data["amount"] = data["total_price"]
     else:
-        data["amount"] = Decimal('0.00')
+        data["amount"] = Decimal("0.00")
 
     # giveaway
     data["is_giveaway"] = bool(data["is_giveaway"])
@@ -161,11 +181,13 @@ def data_cleanup(raw):
     data["is_disputed"] = bool(data["is_disputed"])
 
     # quantity
-    data["quantity"] = int(data["quantity"].split()[0]
-                           ) if data["quantity"] else 1
+    data["quantity"] = (
+        int(data["quantity"].split()[0]) if data["quantity"] else 1
+    )
     if data["quantity"] > 1:
-        data["price_per_unit"] = (data["price"] / Decimal(data["quantity"])
-                                  ).quantize(Decimal('1.00'), rounding=ROUND_HALF_UP)
+        data["price_per_unit"] = (
+            data["price"] / Decimal(data["quantity"])
+        ).quantize(Decimal("1.00"), rounding=ROUND_HALF_UP)
     else:
         data["price_per_unit"] = data["price"]
 
@@ -193,17 +215,19 @@ def data_cleanup(raw):
         raise exceptions.EmptyDataError(f"No Phone. User: {data['full_name']}")
     if data["c_title"] == "":
         raise exceptions.EmptyDataError(
-            f"No Category Title. User: {data['phone']}")
+            f"No Category Title. User: {data['phone']}"
+        )
     if data["p_title"] == "":
         raise exceptions.EmptyDataError(
-            f"No Product Title. User: {data['phone']}")
+            f"No Product Title. User: {data['phone']}"
+        )
 
     return data
 
 
 def upload_previous_orders(file):
-    content = StringIO(file.read().decode('utf-8'))
-    reader = csv.reader(content, delimiter=',')
+    content = StringIO(file.read().decode("utf-8"))
+    reader = csv.reader(content, delimiter=",")
     # skip the headers
     next(reader, None)
     total_count = 0
@@ -224,8 +248,8 @@ def upload_previous_orders(file):
             "full_name": row[5],
             "c_title": row[6],  # category title
             "p_title": row[7],  # product title
-            "s_name": row[8],   # size name
-            "c_name": row[9],   # color name
+            "s_name": row[8],  # size name
+            "c_name": row[9],  # color name
             "is_paid": row[10],
             "is_advance": row[10],
             "is_disputed": row[11],
@@ -237,9 +261,9 @@ def upload_previous_orders(file):
             "payment_method": row[16],
             "address": row[17],
             "delivery_to": row[17],
-            "subtotal_price": row[18],   # order
-            "price": row[18],   # order_item, payment_item.is_advance
-            "price_per_unit": row[18],   # order_item, calculate from quantity
+            "subtotal_price": row[18],  # order
+            "price": row[18],  # order_item, payment_item.is_advance
+            "price_per_unit": row[18],  # order_item, calculate from quantity
             "delivery_charge": row[19],
             "discount": row[20],
             "medium": row[21],
@@ -280,7 +304,7 @@ def upload_previous_orders(file):
             "category__title": cleaned_data["c_title"],
         }
         order = {
-            "customer__phone": cleaned_data["phone"],   # UNIQUE phone
+            "customer__phone": cleaned_data["phone"],  # UNIQUE phone
             "medium": cleaned_data["medium"],
             "status": cleaned_data["status"],
             "subtotal_price": cleaned_data["subtotal_price"],
@@ -332,63 +356,88 @@ def upload_previous_orders(file):
     # bulk create
     # customers
     models.Customer.objects.bulk_create(
-        [models.Customer(**c) for c in customers], ignore_conflicts=True)
-    customer_ids = {c["phone"]: c["id"] for c in models.Customer.objects.filter(phone__in=u_customers).values(
-        "id", "phone").iterator()}
+        [models.Customer(**c) for c in customers], ignore_conflicts=True
+    )
+    customer_ids = {
+        c["phone"]: c["id"]
+        for c in models.Customer.objects.filter(phone__in=u_customers)
+        .values("id", "phone")
+        .iterator()
+    }
     # categories
     models.Category.objects.bulk_create(
-        [models.Category(**c) for c in categories], ignore_conflicts=True)
+        [models.Category(**c) for c in categories], ignore_conflicts=True
+    )
     # get ids for unique category entries
-    category_ids = {c["title"]: c["id"] for c in models.Category.objects.filter(title__in=u_categories).values(
-        "id", "title").iterator()}
+    category_ids = {
+        c["title"]: c["id"]
+        for c in models.Category.objects.filter(title__in=u_categories)
+        .values("id", "title")
+        .iterator()
+    }
     # sizes
     models.Size.objects.bulk_create(
-        [models.Size(**s) for s in sizes], ignore_conflicts=True)
+        [models.Size(**s) for s in sizes], ignore_conflicts=True
+    )
     # colors
     models.Color.objects.bulk_create(
-        [models.Color(**c) for c in colors], ignore_conflicts=True)
+        [models.Color(**c) for c in colors], ignore_conflicts=True
+    )
     # products
     for p in products:
         p["category_id"] = category_ids[p["category__title"]]
         p.pop("category__title", None)
     models.Product.objects.bulk_create(
-        [models.Product(**p) for p in products], ignore_conflicts=True)
-    product_ids = {p["title"]: p["id"] for p in models.Product.objects.filter(title__in=u_products).values(
-        "id", "title").iterator()}
+        [models.Product(**p) for p in products], ignore_conflicts=True
+    )
+    product_ids = {
+        p["title"]: p["id"]
+        for p in models.Product.objects.filter(title__in=u_products)
+        .values("id", "title")
+        .iterator()
+    }
     # orders
     if not (len(orders) == len(payment_items) == len(order_items)):
         raise ValueError(
-            "Orders, payment items and order items not equal in len")
+            "Orders, payment items and order items not equal in len"
+        )
     for o in orders:
         o["customer_id"] = customer_ids[o["customer__phone"]]
         o.pop("customer__phone", None)
     order_ids = models.Order.objects.bulk_create(
-        [models.Order(**o) for o in orders])
+        [models.Order(**o) for o in orders]
+    )
     # payment_items
     for idx, p in enumerate(payment_items):
         p["order_id"] = order_ids[idx].id
     models.PaymentItem.objects.bulk_create(
-        [models.PaymentItem(**p) for p in payment_items])
+        [models.PaymentItem(**p) for p in payment_items]
+    )
     # order_items
     for idx, o in enumerate(order_items):
         o["order_id"] = order_ids[idx].id
         o["product_id"] = product_ids[o["product__title"]]
         o.pop("product__title", None)
     models.OrderItem.objects.bulk_create(
-        [models.OrderItem(**o) for o in order_items])
+        [models.OrderItem(**o) for o in order_items]
+    )
 
     # remove this codeblock
     with open("test-clean.json", "w") as f:
-        json.dump({
-            "customers": customers,
-            "categories": categories,
-            "sizes": sizes,
-            "colors": colors,
-            "products": products,
-            "orders": orders,
-            "payment_items": payment_items,
-            "order_items": order_items
-        }, f, default=str)
+        json.dump(
+            {
+                "customers": customers,
+                "categories": categories,
+                "sizes": sizes,
+                "colors": colors,
+                "products": products,
+                "orders": orders,
+                "payment_items": payment_items,
+                "order_items": order_items,
+            },
+            f,
+            default=str,
+        )
 
     return count, total_count
 
@@ -399,7 +448,9 @@ def upload_orders_csv(request, form):
         count, total_count = upload_previous_orders(form.cleaned_data["file"])
         if count > 0:
             messages.add_message(
-                request, messages.INFO, f"Successfully uploaded {count} / {total_count} order(s)"
+                request,
+                messages.INFO,
+                f"Successfully uploaded {count} / {total_count} order(s)",
             )
         else:
             messages.add_message(
