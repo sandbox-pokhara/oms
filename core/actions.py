@@ -522,3 +522,27 @@ def create_ncm_order(
         f"Sucessfully created {len(queryset)} NCM orders.",
         messages.SUCCESS,
     )
+
+
+@admin.action(description="Mark as paid")
+def update_order_is_paid(
+    modeladmin: admin.ModelAdmin,  # type: ignore
+    request: HttpRequest,
+    queryset: QuerySet[models.Order],
+):
+    queryset.update(is_paid=True)
+    modeladmin.message_user(
+        request, "Selected items have been marked as paid."
+    )
+
+
+@admin.action(description="Mark as completed")
+def update_order_status(
+    modeladmin: admin.ModelAdmin,  # type: ignore
+    request: HttpRequest,
+    queryset: QuerySet[models.Order],
+):
+    queryset.update(status="Completed")
+    modeladmin.message_user(
+        request, "Selected items status has been marked as completed."
+    )

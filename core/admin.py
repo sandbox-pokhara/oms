@@ -1,9 +1,13 @@
 from django.contrib import admin
 from django.db.models import Sum
+from django.utils.timesince import timesince
+from django.utils.timezone import now
 from form_action import ExtraButtonMixin
 
 from core import models
 from core.actions import create_ncm_order
+from core.actions import update_order_is_paid
+from core.actions import update_order_status
 from core.actions import upload_orders_csv
 
 
@@ -37,11 +41,11 @@ class CustomerAdmin(admin.ModelAdmin):
     list_filter = ("gender",)
 
     @admin.display(description="Orderitems")
-    def get_order_items(self, obj):
+    def get_order_items(self, obj: models.Customer):
         return models.OrderItem.objects.filter(order__customer=obj).count()
 
     @admin.display(description="Total paid")
-    def get_total_paid(self, obj):
+    def get_total_paid(self, obj: models.Customer):
         return models.PaymentItem.objects.filter(
             order__customer=obj
         ).aggregate(Sum("amount"))["amount__sum"]
@@ -58,7 +62,7 @@ class CategoryAdmin(admin.ModelAdmin):
     list_filter = ("title",)
 
     @admin.display(description="Products")
-    def get_products_count(self, obj):
+    def get_products_count(self, obj: models.Category):
         return models.Product.objects.filter(category=obj).count()
 
 
@@ -73,7 +77,7 @@ class SizeAdmin(admin.ModelAdmin):
     list_filter = ("name",)
 
     @admin.display(description="Sold count")
-    def get_order_items(self, obj):
+    def get_order_items(self, obj: models.Size):
         return models.OrderItem.objects.filter(size=obj.name).count()
 
 
@@ -88,7 +92,7 @@ class ColorAdmin(admin.ModelAdmin):
     list_filter = ("name",)
 
     @admin.display(description="Sold count")
-    def get_order_items(self, obj):
+    def get_order_items(self, obj: models.Color):
         return models.OrderItem.objects.filter(color=obj.name).count()
 
 
@@ -115,12 +119,12 @@ class ProductAdmin(admin.ModelAdmin):
     autocomplete_fields = ("category", "available_sizes", "available_colors")
 
     @admin.display(description="Sold count")
-    def get_order_items(self, obj):
+    def get_order_items(self, obj: models.Product) -> int:
         return obj.order_items.count()
 
 
 @admin.register(models.Order)
-class OrderAdmin(ExtraButtonMixin, admin.ModelAdmin):
+class OrderAdmin(ExtraButtonMixin, admin.ModelAdmin):  # type: ignore
     list_display = (
         "id",
         "customer",
@@ -131,7 +135,12 @@ class OrderAdmin(ExtraButtonMixin, admin.ModelAdmin):
         "delivery_address",
         "delivery_method",
         "ncm_order_id",
+        "created_at_relative",
     )
+
+    @admin.display(description="Created At (Relative)")
+    def created_at_relative(self, obj: models.Order):
+        return timesince(obj.created_at, now())
 
     ordering = ("-id",)
 
@@ -149,7 +158,7 @@ class OrderAdmin(ExtraButtonMixin, admin.ModelAdmin):
 
     inlines = (OrderItemInline,)
 
-    actions = (create_ncm_order,)
+    actions = (create_ncm_order, update_order_is_paid, update_order_status)
 
     extra_buttons = (upload_orders_csv,)
 
@@ -205,7 +214,7 @@ class OrderItemAdmin(admin.ModelAdmin):
     autocomplete_fields = ("order", "product")
 
     @admin.display(description="Ordered by")
-    def get_ordered_by(self, obj):
+    def get_ordered_by(self, obj: models.OrderItem):
         return obj.order.customer.full_name
 
 
