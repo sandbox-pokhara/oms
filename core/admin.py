@@ -3,6 +3,7 @@ from django.db.models import Sum
 from form_action import ExtraButtonMixin
 
 from core import models
+from core.actions import create_ncm_order
 from core.actions import upload_orders_csv
 
 
@@ -126,8 +127,10 @@ class OrderAdmin(ExtraButtonMixin, admin.ModelAdmin):
         "total_price",
         "status",
         "is_paid",
-        "delivery_to",
+        "delivery_ncm_to",
+        "delivery_address",
         "delivery_method",
+        "ncm_order_id",
     )
 
     ordering = ("-id",)
@@ -145,6 +148,8 @@ class OrderAdmin(ExtraButtonMixin, admin.ModelAdmin):
     list_filter = ("status", "customer__gender", "is_paid", "delivery_method")
 
     inlines = (OrderItemInline,)
+
+    actions = (create_ncm_order,)
 
     extra_buttons = (upload_orders_csv,)
 
@@ -212,4 +217,5 @@ class SettingsAdmin(admin.ModelAdmin):
         "wc_consumer_key",
         "wc_consumer_secret",
         "ncm_key",
+        "delivery_ncm_from",
     )

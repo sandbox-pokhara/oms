@@ -26,6 +26,7 @@ class Command(BaseCommand):
             auth=(settings.wc_consumer_key, settings.wc_consumer_secret),
         )
         res.raise_for_status()
+        settings, _ = Settings.objects.get_or_create(id=1)
         for order_data in res.json():
             serializer = WcNewOrderSerializer(data=order_data)
             serializer.is_valid(raise_exception=True)
@@ -71,7 +72,9 @@ class Command(BaseCommand):
                     discount=wc_data["discount_total"],
                     total_price=wc_data["total"],
                     customer_note=wc_data["customer_note"],
-                    delivery_to=wc_data["shipping"]["address"],
+                    delivery_ncm_from=settings.delivery_ncm_from,
+                    delivery_ncm_to=wc_data["shipping"]["delivery_ncm_to"],
+                    delivery_address=wc_data["shipping"]["address"],
                     delivery_note=wc_data["customer_note"],
                     ordered_at=wc_data["date_created"],
                 )

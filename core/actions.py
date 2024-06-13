@@ -5,7 +5,11 @@ from decimal import ROUND_HALF_UP
 from decimal import Decimal
 from io import StringIO
 
+import httpx
+from django.contrib import admin
 from django.contrib import messages
+from django.db.models.query import QuerySet
+from django.http import HttpRequest
 from django.http.response import HttpResponseRedirect
 from django.utils import timezone
 from form_action import extra_button
@@ -463,3 +467,58 @@ def upload_orders_csv(request, form):
         raise e
 
     return HttpResponseRedirect("/admin/core/order/")
+
+
+@admin.action(description="Create ncm order for selected orders")
+def create_ncm_order(
+    modeladmin: admin.ModelAdmin,  # type: ignore
+    request: HttpRequest,
+    queryset: QuerySet[models.Order],
+):
+    for o in queryset:
+        if not o.delivery_ncm_from:
+            modeladmin.message_user(
+                request,
+                f"Order #{o.pk} has no NCM from branch.",
+                messages.ERROR,
+            )
+            return
+        if not o.delivery_ncm_to:
+            modeladmin.message_user(
+                request,
+                f"Order #{o.pk} has no NCM delivery branch.",
+                messages.ERROR,
+            )
+            return
+    count = 0
+    settings, _ = models.Settings.objects.get_or_create(id=1)
+    for o in queryset:
+        try:
+            data = {
+                "name": o.customer.full_name,
+                "phone": o.customer.phone,
+                "phone2": o.customer.phone2,
+                "cod_charge": o.total_price if o.is_paid else Decimal("0.00"),
+                "address": o.delivery_address,
+                "fbranch": o.delivery_ncm_from,
+                "branch": o.delivery_ncm_to,
+            }
+            headers = {"Authorization": f"Token {settings.ncm_key}"}
+            res = httpx.post(
+                settings.ncm_url + "/api/v1/order/create",
+                data=data,
+                headers=headers,
+            )
+            res.raise_for_status()
+            order_id = res.json()["orderid"]
+            o.ncm_order_id = order_id
+            o.save()
+            count += 1
+        except httpx.HTTPError as e:
+            modeladmin.message_user(request, str(e), messages.ERROR)
+            return
+    modeladmin.message_user(
+        request,
+        f"Sucessfully created {len(queryset)} NCM orders.",
+        messages.SUCCESS,
+    )
