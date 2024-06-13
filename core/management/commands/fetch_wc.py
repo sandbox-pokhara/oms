@@ -32,6 +32,9 @@ class Command(BaseCommand):
             serializer.is_valid(raise_exception=True)
             wc_data: Any = serializer.validated_data  # type: ignore
 
+            if wc_data["status"] == "Canceled":
+                return
+
             # check if order already exists
             if models.Order.objects.filter(
                 medium=models.MediumChoices.WEBSITE,
