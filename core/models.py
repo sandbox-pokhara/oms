@@ -39,6 +39,8 @@ class StatusChoices(models.TextChoices):
     CANCELED = "Canceled"
     DISPUTED = "Disputed"
     COMPLETED = "Completed"
+    FAILED = "Failed"
+    DRAFT = "Draft"
 
 
 class DeliveryMethodChoices(models.TextChoices):
@@ -63,7 +65,8 @@ class PaymentMethodChoices(models.TextChoices):
     EBANKING = "ebanking"
 
 
-class LogoChoices(models.TextChoices):
+class LogoVariationChoices(models.TextChoices):
+    DEFAULT = "Default"
     RZZY = "Rzzy"
     AOT = "Attack On Titan"
     OP3D2Y = "Onepiece 3D2Y"
@@ -98,10 +101,10 @@ AmountField = partial(
 ### Models
 ##############################################################################
 class Settings(models.Model):
-    wc_consumer_key = models.CharField(max_length=64, blank=True, default="")
-    wc_consumer_secret = models.CharField(
-        max_length=64, blank=True, default=""
-    )
+    wc_url = models.URLField(default="", blank=True)
+    wc_consumer_key = OptionalCharField()
+    wc_consumer_secret = OptionalCharField()
+    ncm_key = OptionalCharField()
 
     class Meta:
         verbose_name_plural = "Settings"
@@ -167,7 +170,7 @@ class Category(TimestampedModel):
     description = OptionalTextField()
     image_url = OptionalURLField()
 
-    class Meta:
+    class Meta:  # type: ignore
         verbose_name_plural = "Categories"
 
     def __str__(self):
@@ -187,6 +190,8 @@ class Color(TimestampedModel):
 
 
 class Product(TimestampedModel):
+    # woocommerce product id if any
+    wc_product_id = OptionalCharField()
     title = models.CharField(max_length=255, unique=True)
     description = OptionalTextField()
     image_url = OptionalURLField()
@@ -194,9 +199,9 @@ class Product(TimestampedModel):
         Category, on_delete=models.PROTECT, related_name="products"
     )
     # available sizes = S, M, L, XL, ...
-    available_sizes = models.ManyToManyField(Size, blank=True)
+    available_sizes = models.ManyToManyField(Size, blank=True)  # type: ignore
     # available colors = Black, White, ...
-    available_colors = models.ManyToManyField(Color, blank=True)
+    available_colors = models.ManyToManyField(Color, blank=True)  # type: ignore
     # current stock number, 0 = out of stock
     stock = models.PositiveSmallIntegerField(default=0)
     price = AmountField(default=Decimal("0.00"))
@@ -206,6 +211,10 @@ class Product(TimestampedModel):
 
 
 class Order(TimestampedModel):
+    # woocommerce order key (wc_order_fdqKhqbFYwilB)
+    wc_order_id = OptionalCharField()
+    # woocommerce order id (Woocommerce) if any
+    wc_order_key = OptionalCharField()
     customer = models.ForeignKey(
         Customer, on_delete=models.PROTECT, related_name="orders"
     )
@@ -221,10 +230,13 @@ class Order(TimestampedModel):
     )
     subtotal_price = AmountField()
     delivery_charge = AmountField(default=Decimal("150.00"))
+    # total discount, Sum of all order items' discount
     discount = AmountField(default=Decimal("0.00"))
     # grand total
     total_price = AmountField()
     is_paid = models.BooleanField(default=False)
+    # customer notes for order, can be same as delivery_note
+    customer_note = OptionalTextField()
     # delivery to/from addresses
     delivery_from = OptionalCharField(default="Pokhara")
     delivery_to = models.CharField(max_length=255)
@@ -245,7 +257,7 @@ class Order(TimestampedModel):
     paid_at = OptionalDateTimeField()  # full payment
 
     def __str__(self):
-        return f"Order #{self.id}"
+        return f"Order #{self.id}"  # type:ignore
 
 
 class PaymentItem(TimestampedModel):
@@ -265,6 +277,8 @@ class PaymentItem(TimestampedModel):
 
 
 class OrderItem(TimestampedModel):
+    # woocommerce order item id if any
+    wc_item_id = OptionalCharField()
     product = models.ForeignKey(
         Product, on_delete=models.PROTECT, related_name="order_items"
     )
@@ -281,12 +295,19 @@ class OrderItem(TimestampedModel):
     color = models.CharField(
         max_length=5, choices=ColorChoices.choices, default=ColorChoices.BLACK
     )
+    logo_variation = models.CharField(
+        max_length=15,
+        choices=LogoVariationChoices.choices,
+        default=LogoVariationChoices.DEFAULT,
+    )
     # quantity of same product ordered
     quantity = models.PositiveSmallIntegerField(default=1)
     # added charge for including longsleeve
     include_longsleeve = models.BooleanField(default=False)
     # price of a single product
     price_per_unit = AmountField()
+    # discount in each order item(not each product)
+    discount = AmountField(default=Decimal("0.00"))
     # price for all products
     price = AmountField()
     # if the item is disputed(request for return/exchange/refund)

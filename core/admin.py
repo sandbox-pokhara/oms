@@ -200,4 +200,10 @@ class OrderItemAdmin(admin.ModelAdmin):
 
 @admin.register(models.Settings)
 class SettingsAdmin(admin.ModelAdmin):
-    list_display = ("id", "wc_consumer_key", "wc_consumer_secret")
+    list_display = (
+        "id",
+        "wc_url",
+        "wc_consumer_key",
+        "wc_consumer_secret",
+        "ncm_key",
+    )
