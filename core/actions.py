@@ -6,8 +6,6 @@ from decimal import Decimal
 from io import StringIO
 from typing import Any
 from typing import BinaryIO
-from typing import Dict
-from typing import List
 
 import httpx
 from django.contrib import admin
@@ -30,14 +28,14 @@ class DecimalEncoder(json.JSONEncoder):
         return super().default(o)
 
 
-def get_unique_values(data: List[Any], unique_field: str = "id") -> List[Any]:
+def get_unique_values(data: list[Any], unique_field: str = "id") -> list[Any]:
     try:
         return list(d[unique_field] for d in data)
     except KeyError:
         return []
 
 
-def data_cleanup(raw: Dict[str, Any]):
+def data_cleanup(raw: dict[str, Any]):
     # shallow copy
     data = dict(raw)
     # trim leading and trailing spaces
@@ -240,14 +238,14 @@ def upload_previous_orders(file: BinaryIO):
     next(reader, None)
     total_count = 0
     count = 0
-    customers: List[Dict[str, Any]] = []
-    categories: List[Dict[str, str]] = []
-    sizes: List[Dict[str, str]] = []
-    colors: List[Dict[str, str]] = []
-    products: List[Dict[str, str]] = []
-    orders: List[Dict[str, Any]] = []
-    payment_items: List[Dict[str, Any]] = []
-    order_items: List[Dict[str, Any]] = []
+    customers: list[dict[str, Any]] = []
+    categories: list[dict[str, str]] = []
+    sizes: list[dict[str, str]] = []
+    colors: list[dict[str, str]] = []
+    products: list[dict[str, str]] = []
+    orders: list[dict[str, Any]] = []
+    payment_items: list[dict[str, Any]] = []
+    order_items: list[dict[str, Any]] = []
     for row in reader:
         raw_data = {
             "delivery_package_id": row[1],
