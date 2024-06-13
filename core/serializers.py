@@ -1,5 +1,8 @@
 from decimal import ROUND_HALF_UP
 from decimal import Decimal
+from typing import Any
+from typing import Dict
+from typing import List
 
 from rest_framework import serializers  # type: ignore
 
@@ -112,7 +115,7 @@ class WcNewOrderSerializer(serializers.Serializer):
     customer_note = serializers.CharField(required=False, allow_blank=True)
     line_items = serializers.ListField(child=serializers.DictField())
 
-    def validate_status(self, value):
+    def validate_status(self, value: str):
         # pending, processing, on-hold, completed, cancelled, refunded, failed and trash
         status_map = {
             "pending": StatusChoices.PENDING,
@@ -126,9 +129,9 @@ class WcNewOrderSerializer(serializers.Serializer):
         }
         return status_map.get(value, StatusChoices.PENDING)
 
-    def validate_billing(self, value):
+    def validate_billing(self, value: Dict[str, Any]):
         # only add required k:v
-        new_val = {}
+        new_val: Dict[str, Any] = {}
         new_val["full_name"] = value["first_name"] + " " + value["last_name"]
         new_val["address"] = value["address_1"]
         new_val["phone"] = value["phone"]
@@ -142,17 +145,19 @@ class WcNewOrderSerializer(serializers.Serializer):
         new_val["delivery_ncm_to"] = WC_NCM_MAP.get(value["state"], "")
         return new_val
 
-    def validate_payment_method(self, value):
+    def validate_payment_method(self, value: str):
         if value in ["e", "esewa", "eSewa"]:
             return PaymentMethodChoices.ESEWA_PERSONAL
         if value == "cod":
             return PaymentMethodChoices.COD
         return PaymentMethodChoices.COD
 
-    def validate_line_items(self, value):
-        new_value = []
+    def validate_line_items(
+        self, value: List[Dict[str, Any]]
+    ) -> List[Dict[str, str]]:
+        new_value: List[Dict[str, Any]] = []
         for item in value:
-            new_item = {}
+            new_item: Dict[str, Any] = {}
             new_item["id"] = item["id"]
             new_item["product_id"] = item["product_id"]
             new_item["name"] = item["name"]
