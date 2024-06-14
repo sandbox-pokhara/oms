@@ -9,7 +9,7 @@ The minimal open-source selfhosted order management system. It takes about 2 min
 ### 🚀 Deployment
 
 ```bash
-curl -o docker-compose.yml https://raw.githubusercontent.com/sandbox-pokhara/oms/main/docker-compose.yml
+curl -O https://raw.githubusercontent.com/sandbox-pokhara/oms/main/docker-compose.yml
 curl -o .env https://raw.githubusercontent.com/sandbox-pokhara/oms/main/.env.sample # update the env file
 docker compose up
 
