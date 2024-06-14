@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+from typing import Any
 
 from project.env import ENV
 
@@ -55,7 +56,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "project.urls"
 
-TEMPLATES = [
+TEMPLATES: list[dict[str, Any]] = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [],
