@@ -3,16 +3,12 @@ version: "3"
 tasks:
   build:
     cmds:
-      - docker build . -t ghcr.io/sandbox-pokhara/rzzy-oms
+      - docker build . -t ghcr.io/sandbox-pokhara/oms
 
   publish:
     cmds:
-      - docker image push ghcr.io/sandbox-pokhara/rzzy-oms
+      - docker image push ghcr.io/sandbox-pokhara/oms
 
   deploy:
     cmds:
-      - ssh rzzy -t "cd rzzy-oms && git pull && docker compose -f docker-compose.prod.yml pull && docker compose -f docker-compose.prod.yml up --force-recreate --remove-orphans --build --detach"
-
-  prune:
-    cmds:
-      - ssh rzzy -t "docker image prune -f"
+      - ssh sandbox-ovh -t "cd oms && docker compose pull && docker compose up -d --force-recreate web "

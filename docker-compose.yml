@@ -1,6 +1,7 @@
 version: "3"
 services:
   db:
+    restart: unless-stopped
     image: postgres:13-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data/
@@ -12,13 +13,9 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-
   web:
-    build:
-      context: .
-      dockerfile: Dockerfile.dev
-    volumes:
-      - .:/app
+    restart: unless-stopped
+    image: ghcr.io/sandbox-pokhara/oms:latest
     env_file: .env
     environment:
       - POSTGRES_HOST=db
@@ -27,6 +24,5 @@ services:
     depends_on:
       db:
         condition: service_healthy
-
 volumes:
   postgres_data:
