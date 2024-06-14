@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.humanize.templatetags.humanize import naturaltime
 from django.db.models import Sum
+from django.http import HttpRequest
 from form_action import ExtraButtonMixin  # type: ignore
 
 from core import models
@@ -13,13 +14,21 @@ from core.actions import upload_orders_csv
 class OrderItemInline(admin.StackedInline[models.OrderItem]):
     extra = 0
     model = models.OrderItem
-    exclude = (
-        "wc_item_id",
-        "is_giveaway",
-        "giveaway_reason",
-        "is_disputed",
-        "dispute_remarks",
-    )
+
+    def get_exclude(
+        self, request: HttpRequest, obj: None | models.OrderItem = None
+    ):
+        if obj:  # This is an update (not a creation)
+            return ()
+        return (
+            "wc_item_id",
+            "is_giveaway",
+            "giveaway_reason",
+            "is_disputed",
+            "dispute_remarks",
+        )
+
+    exclude = ()
 
 
 @admin.register(models.Customer)
@@ -169,17 +178,24 @@ class OrderAdmin(ExtraButtonMixin, admin.ModelAdmin):  # type: ignore
 
     extra_buttons = (upload_orders_csv,)
 
-    exclude = (
-        "wc_order_id",
-        "wc_order_key",
-        "ncm_order_id",
-        "status",
-        "delivery_package_id ",
-        "ordered_at",
-        "shipped_at",
-        "paid_at",
-        "delivered_at",
-    )
+    def get_exclude(
+        self, request: HttpRequest, obj: None | models.Order = None
+    ):
+        if obj:  # This is an update (not a creation)
+            return ()
+        return (
+            "wc_order_id",
+            "wc_order_key",
+            "ncm_order_id",
+            "status",
+            "delivery_package_id",
+            "ordered_at",
+            "shipped_at",
+            "paid_at",
+            "delivered_at",
+        )
+
+    exclude = ()
 
 
 @admin.register(models.PaymentItem)
