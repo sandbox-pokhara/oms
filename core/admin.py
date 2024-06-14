@@ -13,6 +13,13 @@ from core.actions import upload_orders_csv
 class OrderItemInline(admin.StackedInline):
     extra = 0
     model = models.OrderItem
+    exclude = (
+        "wc_item_id",
+        "is_giveaway",
+        "giveaway_reason",
+        "is_disputed",
+        "dispute_remarks",
+    )
 
 
 @admin.register(models.Customer)
@@ -162,7 +169,17 @@ class OrderAdmin(ExtraButtonMixin, admin.ModelAdmin):  # type: ignore
 
     extra_buttons = (upload_orders_csv,)
 
-    exclude = ("shipped_at", "paid_at", "delivered_at")
+    exclude = (
+        "wc_order_id",
+        "wc_order_key",
+        "ncm_order_id",
+        "status",
+        "delivery_package_id ",
+        "ordered_at",
+        "shipped_at",
+        "paid_at",
+        "delivered_at",
+    )
 
 
 @admin.register(models.PaymentItem)
