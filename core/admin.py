@@ -1,7 +1,6 @@
 from django.contrib import admin
+from django.contrib.humanize.templatetags.humanize import naturaltime
 from django.db.models import Sum
-from django.utils.timesince import timesince
-from django.utils.timezone import now
 from form_action import ExtraButtonMixin
 
 from core import models
@@ -11,7 +10,8 @@ from core.actions import update_order_status
 from core.actions import upload_orders_csv
 
 
-class OrderItemInline(admin.TabularInline):
+class OrderItemInline(admin.StackedInline):
+    extra = 0
     model = models.OrderItem
 
 
@@ -138,9 +138,9 @@ class OrderAdmin(ExtraButtonMixin, admin.ModelAdmin):  # type: ignore
         "created_at_relative",
     )
 
-    @admin.display(description="Created At (Relative)")
+    @admin.display(description="Date Created")
     def created_at_relative(self, obj: models.Order):
-        return timesince(obj.created_at, now())
+        return naturaltime(obj.created_at)
 
     ordering = ("-id",)
 
