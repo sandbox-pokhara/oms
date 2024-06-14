@@ -7,6 +7,7 @@ from django.db import transaction
 
 from core import models
 from core.models import Settings
+from core.models import StatusChoices
 from core.serializers import WcNewOrderSerializer
 
 
@@ -31,6 +32,9 @@ class Command(BaseCommand):
             serializer = WcNewOrderSerializer(data=order_data)
             serializer.is_valid(raise_exception=True)
             wc_data: Any = serializer.validated_data  # type: ignore
+
+            if wc_data["status"] == StatusChoices.CANCELED:
+                continue
 
             # check if order already exists
             if models.Order.objects.filter(
