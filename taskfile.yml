@@ -11,4 +11,4 @@ tasks:
 
   deploy:
     cmds:
-      - ssh sandbox-ovh -t "cd oms && docker compose pull && docker compose up -d --force-recreate web "
+      - ssh sandbox-ovh -t "cd oms && docker compose pull && docker compose up -d "
