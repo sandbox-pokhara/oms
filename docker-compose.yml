@@ -24,5 +24,15 @@ services:
     depends_on:
       db:
         condition: service_healthy
+  cron:
+    restart: unless-stopped
+    image: ghcr.io/sandbox-pokhara/oms:latest
+    env_file: .env
+    environment:
+      - POSTGRES_HOST=db
+    depends_on:
+      db:
+        condition: service_healthy
+    command: ["crond", "-l", "2", "-f"]
 volumes:
   postgres_data:

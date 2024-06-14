@@ -6,6 +6,7 @@ ENV PYTHONUNBUFFERED=1
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
+RUN echo "*/5 * * * * python3 /app/manage.py fetch_wc" >> /etc/crontabs/root
 COPY manage.py .
 COPY project project 
 COPY core core
