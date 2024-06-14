@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.humanize.templatetags.humanize import naturaltime
 from django.db.models import Sum
-from form_action import ExtraButtonMixin
+from form_action import ExtraButtonMixin  # type: ignore
 
 from core import models
 from core.actions import create_ncm_order
@@ -10,13 +10,13 @@ from core.actions import update_order_status
 from core.actions import upload_orders_csv
 
 
-class OrderItemInline(admin.StackedInline):
+class OrderItemInline(admin.StackedInline):  # type: ignore
     extra = 0
     model = models.OrderItem
 
 
 @admin.register(models.Customer)
-class CustomerAdmin(admin.ModelAdmin):
+class CustomerAdmin(admin.ModelAdmin):  # type: ignore
     list_display = (
         "id",
         "full_name",
@@ -52,7 +52,7 @@ class CustomerAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.Category)
-class CategoryAdmin(admin.ModelAdmin):
+class CategoryAdmin(admin.ModelAdmin):  # type: ignore
     list_display = ("id", "title", "get_products_count")
 
     ordering = ("-id",)
@@ -67,7 +67,7 @@ class CategoryAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.Size)
-class SizeAdmin(admin.ModelAdmin):
+class SizeAdmin(admin.ModelAdmin):  # type: ignore
     list_display = ("id", "name", "get_order_items")
 
     ordering = ("-id",)
@@ -82,7 +82,7 @@ class SizeAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.Color)
-class ColorAdmin(admin.ModelAdmin):
+class ColorAdmin(admin.ModelAdmin):  # type: ignore
     list_display = ("id", "name", "get_order_items")
 
     ordering = ("-id",)
@@ -97,7 +97,7 @@ class ColorAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.Product)
-class ProductAdmin(admin.ModelAdmin):
+class ProductAdmin(admin.ModelAdmin):  # type: ignore
     list_per_page = 20
     list_display = (
         "id",
@@ -120,7 +120,7 @@ class ProductAdmin(admin.ModelAdmin):
 
     @admin.display(description="Sold count")
     def get_order_items(self, obj: models.Product) -> int:
-        return obj.order_items.count()
+        return obj.order_items.count()  # type: ignore
 
 
 @admin.register(models.Order)
@@ -164,7 +164,7 @@ class OrderAdmin(ExtraButtonMixin, admin.ModelAdmin):  # type: ignore
 
 
 @admin.register(models.PaymentItem)
-class PaymentItemAdmin(admin.ModelAdmin):
+class PaymentItemAdmin(admin.ModelAdmin):  # type: ignore
     list_display = ("id", "order", "payment_method", "amount", "is_advance")
 
     ordering = ("-id",)
@@ -186,7 +186,7 @@ class PaymentItemAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.OrderItem)
-class OrderItemAdmin(admin.ModelAdmin):
+class OrderItemAdmin(admin.ModelAdmin):  # type: ignore
     list_display = (
         "id",
         "order",
@@ -219,7 +219,7 @@ class OrderItemAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.Settings)
-class SettingsAdmin(admin.ModelAdmin):
+class SettingsAdmin(admin.ModelAdmin):  # type: ignore
     list_display = (
         "id",
         "wc_url",
