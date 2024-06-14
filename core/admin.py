@@ -162,6 +162,8 @@ class OrderAdmin(ExtraButtonMixin, admin.ModelAdmin):  # type: ignore
 
     extra_buttons = (upload_orders_csv,)
 
+    exclude = ("shipped_at", "paid_at")
+
 
 @admin.register(models.PaymentItem)
 class PaymentItemAdmin(admin.ModelAdmin):
