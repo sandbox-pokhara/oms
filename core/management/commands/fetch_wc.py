@@ -15,6 +15,7 @@ class Command(BaseCommand):
     help = "Fetch orders from woocommerce"
 
     def handle(self, *args: Any, **options: Any):
+        print("Fetching orders from woocommerce...")
         settings, _ = Settings.objects.get_or_create(id=1)
         if not settings.wc_url:
             raise CommandError("wc_url not set.")
@@ -119,3 +120,4 @@ class Command(BaseCommand):
                     if item.get("logo_variation"):
                         order_item.logo_variation = item["logo_variation"]
                     order_item.save()
+        print("Success.")
