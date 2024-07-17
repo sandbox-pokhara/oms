@@ -143,7 +143,11 @@ class OrderAdmin(ExtraButtonMixin, admin.ModelAdmin):  # type: ignore
         "delivery_method",
         "ncm_order_id",
         "created_at_relative",
+        "phone_number"
     )
+
+    def phone_number(self, obj):
+        return obj.customer.phone 
 
     @admin.display(description="Date Created")
     def created_at_relative(self, obj: models.Order):
