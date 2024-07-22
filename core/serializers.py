@@ -96,7 +96,7 @@ WC_NCM_MAP = {
 }
 
 
-class WcNewOrderSerializer(serializers.Serializer):
+class WcNewOrderSerializer(serializers.Serializer[Any]):
     """Woocommerce webhook serializer for creating order"""
 
     id = serializers.IntegerField()

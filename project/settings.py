@@ -35,6 +35,7 @@ CSRF_TRUSTED_ORIGINS = ENV.CSRF_TRUSTED_ORIGINS.split(",")
 
 INSTALLED_APPS = [
     "core",
+    "unfold",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -116,7 +117,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "Asia/Kathmandu"
 
 USE_I18N = True
 

@@ -1,6 +1,7 @@
 django-advanced-search==1.0.0
 django-form-action==1.0.5
 django-stubs==5.0.2
+django-unfold==0.32.0
 Django==5.0.7
 djangorestframework-stubs==3.15.0
 djangorestframework==3.15.2

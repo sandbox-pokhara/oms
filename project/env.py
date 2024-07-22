@@ -7,7 +7,7 @@ class Environment(BaseSettings):
     DEBUG: bool = True
     POSTGRES_HOST: str = "localhost"
     POSTGRES_USER: str = "postgres"
-    POSTGRES_DB: str = "rzzy_oms"
+    POSTGRES_DB: str = "oms"
     POSTGRES_PASSWORD: str = "postgres"
     POSTGRES_PORT: int = 5432
     ALLOWED_HOSTS: str = "*"
