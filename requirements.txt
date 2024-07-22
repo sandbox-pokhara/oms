@@ -1,9 +1,9 @@
 django-advanced-search==1.0.0
 django-form-action==1.0.5
-django-stubs==4.2.7
-django==5.0.6
-djangorestframework-stubs==3.14.5
-djangorestframework==3.15.1
+django-stubs==5.0.2
+Django==5.0.7
+djangorestframework-stubs==3.15.0
+djangorestframework==3.15.2
 gunicorn==22.0.0
 httpx==0.27.0
 psycopg2-binary==2.9.9
