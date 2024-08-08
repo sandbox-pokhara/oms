@@ -1,25 +1,17 @@
 from django.contrib import admin
-from django.contrib.auth.admin import GroupAdmin as BaseGroupAdmin
-from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from django.contrib.auth.models import Group
-from django.contrib.auth.models import User
 from django.contrib.humanize.templatetags.humanize import naturaltime
 from django.db.models import Sum
 from django.http import HttpRequest
 from form_action import ExtraButtonMixin  # type: ignore
-from unfold.admin import ModelAdmin  # type: ignore
-from unfold.admin import StackedInline  # type: ignore
 
 from core import models
 from core.actions import create_ncm_order
 from core.actions import update_order_is_paid
 from core.actions import update_order_status
-
-admin.site.unregister(User)
-admin.site.unregister(Group)
+from core.actions import upload_orders_csv
 
 
-class OrderItemInline(StackedInline):
+class OrderItemInline(admin.StackedInline[models.OrderItem]):
     extra = 0
     model = models.OrderItem
 
@@ -39,18 +31,8 @@ class OrderItemInline(StackedInline):
     exclude = ()
 
 
-@admin.register(User)
-class UserAdmin(BaseUserAdmin, ModelAdmin):
-    pass
-
-
-@admin.register(Group)
-class GroupAdmin(BaseGroupAdmin, ModelAdmin):
-    pass
-
-
 @admin.register(models.Customer)
-class CustomerAdmin(ModelAdmin):
+class CustomerAdmin(admin.ModelAdmin[models.Customer]):
     list_display = (
         "id",
         "full_name",
@@ -86,7 +68,7 @@ class CustomerAdmin(ModelAdmin):
 
 
 @admin.register(models.Category)
-class CategoryAdmin(ModelAdmin):
+class CategoryAdmin(admin.ModelAdmin[models.Category]):
     list_display = ("id", "title", "get_products_count")
 
     ordering = ("-id",)
@@ -101,7 +83,7 @@ class CategoryAdmin(ModelAdmin):
 
 
 @admin.register(models.Size)
-class SizeAdmin(ModelAdmin):
+class SizeAdmin(admin.ModelAdmin[models.Size]):
     list_display = ("id", "name", "get_order_items")
 
     ordering = ("-id",)
@@ -116,7 +98,7 @@ class SizeAdmin(ModelAdmin):
 
 
 @admin.register(models.Color)
-class ColorAdmin(ModelAdmin):
+class ColorAdmin(admin.ModelAdmin[models.Color]):
     list_display = ("id", "name", "get_order_items")
 
     ordering = ("-id",)
@@ -131,7 +113,7 @@ class ColorAdmin(ModelAdmin):
 
 
 @admin.register(models.Product)
-class ProductAdmin(ModelAdmin):
+class ProductAdmin(admin.ModelAdmin[models.Product]):
     list_per_page = 20
     list_display = (
         "id",
@@ -158,7 +140,7 @@ class ProductAdmin(ModelAdmin):
 
 
 @admin.register(models.Order)
-class OrderAdmin(ExtraButtonMixin, ModelAdmin):  # type: ignore
+class OrderAdmin(ExtraButtonMixin, admin.ModelAdmin):  # type: ignore
     list_display = (
         "id",
         "customer",
@@ -198,9 +180,7 @@ class OrderAdmin(ExtraButtonMixin, ModelAdmin):  # type: ignore
 
     actions = (create_ncm_order, update_order_is_paid, update_order_status)
 
-    # TODO: fix extra button design in django-unfold and enable
-    # upload orders
-    # extra_buttons = (upload_orders_csv,)
+    extra_buttons = (upload_orders_csv,)
 
     def get_exclude(
         self, request: HttpRequest, obj: None | models.Order = None
@@ -223,7 +203,7 @@ class OrderAdmin(ExtraButtonMixin, ModelAdmin):  # type: ignore
 
 
 @admin.register(models.PaymentItem)
-class PaymentItemAdmin(ModelAdmin):
+class PaymentItemAdmin(admin.ModelAdmin[models.PaymentItem]):
     list_display = ("id", "order", "payment_method", "amount", "is_advance")
 
     ordering = ("-id",)
@@ -245,7 +225,7 @@ class PaymentItemAdmin(ModelAdmin):
 
 
 @admin.register(models.OrderItem)
-class OrderItemAdmin(ModelAdmin):
+class OrderItemAdmin(admin.ModelAdmin[models.OrderItem]):
     list_display = (
         "id",
         "order",
@@ -278,7 +258,7 @@ class OrderItemAdmin(ModelAdmin):
 
 
 @admin.register(models.Settings)
-class SettingsAdmin(ModelAdmin):
+class SettingsAdmin(admin.ModelAdmin[models.Settings]):
     list_display = (
         "id",
         "wc_url",
