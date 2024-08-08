@@ -8,4 +8,4 @@ preview = true
 
 [tool.pyright]
 typeCheckingMode = "strict"
-exclude = ["**/migrations"]
+exclude = ["**/migrations", "**/venv"]
